@@ -60,3 +60,7 @@ it.effect("does not let OTLP serialization failures alter application effects", 
     ),
   );
 });
+
+it("never resolves a T3 tracing config in the Lightsong fork", () => {
+  expect(Tracing.resolveTracingConfig()).toBeNull();
+});

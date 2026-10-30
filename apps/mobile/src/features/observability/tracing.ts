@@ -22,7 +22,11 @@ const RELEASE_CHANNEL_BY_VARIANT: Readonly<Record<string, ReleaseChannel | undef
   production: "stable",
 };
 
+// Lightsong fork lock: mobile traces to T3's Axiom dataset are permanently off.
+export const MOBILE_TRACING_PERMANENTLY_DISABLED = true;
+
 export function resolveTracingConfig(): TracingConfig | null {
+  if (MOBILE_TRACING_PERMANENTLY_DISABLED) return null;
   const config = resolveCloudPublicConfig();
   if (!hasTracingPublicConfig(config)) {
     return null;

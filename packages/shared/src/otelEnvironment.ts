@@ -318,7 +318,13 @@ export const load: Effect.Effect<OtelEnvironment> = Config.all({
   Effect.orDie,
 );
 
+// Lightsong fork lock: relay connection traces to T3's Axiom dataset are permanently off,
+// whatever T3CODE_TELEMETRY_ENABLED or the OTEL SDK flags say. User-configured OTLP export
+// (Settings > Maintenance > Diagnostics) is not affected.
+export const RELAY_TRACING_PERMANENTLY_DISABLED = true;
+
 export const isRelayTracingEnabled = (env: Readonly<Record<string, string | undefined>>) =>
+  !RELAY_TRACING_PERMANENTLY_DISABLED &&
   Config.all({
     ...sdkFlags,
     telemetry: flag("T3CODE_TELEMETRY_ENABLED", T3CODE_TRUE, T3CODE_FALSE, String),

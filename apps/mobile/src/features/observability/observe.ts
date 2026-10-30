@@ -5,7 +5,12 @@ import { Observe } from "expo-observe";
 const relayUrl: unknown = Constants.expoConfig?.extra?.relay?.url;
 const appVariant: unknown = Constants.expoConfig?.extra?.appVariant;
 
-export const crashReportingAvailable = typeof relayUrl === "string" && relayUrl.trim() !== "";
+// Lightsong fork lock: crash reports and startup timings to T3 are permanently off. Observe is
+// always configured with dispatching disabled, and Settings shows the switch off and grayed.
+export const CRASH_REPORTS_PERMANENTLY_DISABLED = true;
+
+export const crashReportingAvailable =
+  !CRASH_REPORTS_PERMANENTLY_DISABLED && typeof relayUrl === "string" && relayUrl.trim() !== "";
 
 interface PromiseRejectionTracker {
   readonly enablePromiseRejectionTracker?: (options: {
