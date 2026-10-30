@@ -90,7 +90,7 @@ export function SettingsDiagnosticsRouteScreen() {
         className="flex-1"
         contentContainerClassName="gap-6 px-5 pt-4 pb-[18px]"
       >
-        {crashReportingAvailable ? <CrashReportsSetting /> : null}
+        {crashReportingAvailable ? <CrashReportsSetting /> : <CrashReportsLockedSetting />}
 
         <SettingsSection title="Startup crashes">
           {state.status === "loading" ? (
@@ -180,6 +180,26 @@ function CrashReportsSetting() {
         When the app crashes or hits an error, it sends the error message, the stack trace, the app
         version, and the device model and OS version to the T3 Code team. Each launch also sends
         startup timings. Reports carry a random ID for this install.
+      </Text>
+    </View>
+  );
+}
+
+// Lightsong fork lock: always Off and non-interactive, so crash reports cannot be turned back on.
+function CrashReportsLockedSetting() {
+  return (
+    <View className="gap-3">
+      <SettingsSection title="Crash reports">
+        <SettingsSwitchRow
+          icon="tray.and.arrow.up"
+          label="Send crash reports"
+          disabled
+          value={false}
+          onValueChange={() => undefined}
+        />
+      </SettingsSection>
+      <Text className="px-2 text-sm leading-normal text-foreground-muted">
+        Crash reports are permanently turned off in this build. Nothing is sent to the T3 Code team.
       </Text>
     </View>
   );

@@ -61,7 +61,12 @@ export function resolveCloudPublicConfig(): CloudPublicConfig {
   };
 }
 
+// Lightsong fork lock: relay connection traces to T3's Axiom dataset are permanently off in
+// every web surface (browser, hosted app, desktop renderer), whatever the build env provides.
+export const RELAY_TRACING_PERMANENTLY_DISABLED = true;
+
 export function resolveRelayTracingConfig() {
+  if (RELAY_TRACING_PERMANENTLY_DISABLED) return null;
   // The relay exporter is created during module initialization, so this must be synchronous.
   if (typeof window !== "undefined" && window.desktopBridge?.getRelayTelemetryEnabled() === false) {
     return null;

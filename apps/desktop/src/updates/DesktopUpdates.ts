@@ -314,8 +314,20 @@ function shouldBroadcastDownloadProgress(
   return nextStep !== previousStep || nextPercent === 100;
 }
 
+/**
+ * Lightsong fork lock: this build is pinned, so automatic updates never run against the
+ * packaged update feed (upstream T3 GitHub releases). Only the local mock update server
+ * (T3CODE_DESKTOP_MOCK_UPDATES, which points the feed at localhost) bypasses the lock, so
+ * the updater tests keep working. Do not flip this to re-enable updates.
+ */
+export const AUTO_UPDATES_PERMANENTLY_DISABLED = true;
+
+export const AUTO_UPDATES_LOCKED_REASON =
+  "Automatic updates are permanently turned off in this build. It does not download releases from T3 Code.";
+
 function getAutoUpdateDisabledReason(args: {
   isDevelopment: boolean;
+  usesLocalMockFeed: boolean;
   isPackaged: boolean;
   platform: NodeJS.Platform;
   appImage?: string | undefined;
@@ -323,6 +335,9 @@ function getAutoUpdateDisabledReason(args: {
   disabledByEnv: boolean;
   hasUpdateFeedConfig: boolean;
 }): string | null {
+  if (AUTO_UPDATES_PERMANENTLY_DISABLED && !args.usesLocalMockFeed) {
+    return AUTO_UPDATES_LOCKED_REASON;
+  }
   if (!args.hasUpdateFeedConfig) {
     return "Automatic updates are not available because no update feed is configured.";
   }
@@ -439,6 +454,7 @@ export const make = Effect.gen(function* () {
     return Option.fromNullishOr(
       getAutoUpdateDisabledReason({
         isDevelopment: environment.isDevelopment,
+        usesLocalMockFeed: config.mockUpdates,
         isPackaged: environment.isPackaged,
         platform: environment.platform,
         appImage: Option.getOrUndefined(config.appImagePath),

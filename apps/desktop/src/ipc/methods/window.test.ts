@@ -178,7 +178,7 @@ describe("getLocalEnvironmentBootstraps", () => {
 });
 
 describe("getRelayTelemetryEnabled", () => {
-  it.effect("reads the desktop host opt-out before returning the renderer policy", () =>
+  it.effect("is always off in the Lightsong fork, even when the host env opts in", () =>
     Effect.gen(function* () {
       assert.isFalse(
         yield* getRelayTelemetryEnabled.handler().pipe(
@@ -187,10 +187,17 @@ describe("getRelayTelemetryEnabled", () => {
           }),
         ),
       );
-      assert.isTrue(
+      assert.isFalse(
         yield* getRelayTelemetryEnabled
           .handler()
           .pipe(Effect.provideService(HostProcess.Environment, {})),
+      );
+      assert.isFalse(
+        yield* getRelayTelemetryEnabled.handler().pipe(
+          Effect.provideService(HostProcess.Environment, {
+            T3CODE_TELEMETRY_ENABLED: "true",
+          }),
+        ),
       );
     }),
   );

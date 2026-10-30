@@ -41,6 +41,29 @@ describe("DesktopUpdates", () => {
     }),
   );
 
+  it.effect("keeps automatic updates locked off without the local mock feed (fork lock)", () => {
+    const harness = makeHarness({ env: { T3CODE_DESKTOP_MOCK_UPDATES: "false" } });
+
+    return Effect.scoped(
+      Effect.gen(function* () {
+        assert.isTrue(DesktopUpdates.AUTO_UPDATES_PERMANENTLY_DISABLED);
+        const updates = yield* DesktopUpdates.DesktopUpdates;
+        yield* updates.configure;
+
+        const configured = yield* updates.getState;
+        assert.equal(configured.enabled, false);
+        assert.equal(configured.status, "disabled");
+        assert.equal(configured.message, DesktopUpdates.AUTO_UPDATES_LOCKED_REASON);
+
+        const checked = yield* updates.check("menu");
+        assert.isFalse(checked.checked);
+        const changed = yield* updates.setChannel("nightly");
+        assert.equal(changed.status, "disabled");
+        assert.equal(harness.checkCount(), 0);
+      }),
+    ).pipe(Effect.provide(harness.layer));
+  });
+
   it.effect("keeps the disabled reason available after configuration and channel changes", () => {
     const harness = makeHarness({ env: { T3CODE_DISABLE_AUTO_UPDATE: "true" } });
     const reason = "Automatic updates are disabled by the T3CODE_DISABLE_AUTO_UPDATE setting.";

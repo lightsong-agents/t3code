@@ -18,12 +18,13 @@ describe("web runtime relay telemetry policy", () => {
     {
       surface: "desktop enabled",
       desktopBridge: { getRelayTelemetryEnabled: () => true },
-      exports: true,
+      // Lightsong fork lock: relay tracing never exports.
+      exports: false,
     },
     {
       surface: "ordinary browser ignores host opt-out",
       desktopBridge: undefined,
-      exports: true,
+      exports: false,
     },
   ])("applies $surface before the first relay span", async ({ desktopBridge, exports }) => {
     vi.resetModules();
